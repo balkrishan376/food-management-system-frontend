@@ -57,20 +57,24 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = '' }) => {
 
 // Floating Particles Background
 const FloatingParticles = () => {
+  const [particles] = useState(() =>
+    Array.from({ length: 20 }, () => ({
+      width: `${Math.random() * 100 + 50}px`,
+      height: `${Math.random() * 100 + 50}px`,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 5}s`,
+      animationDuration: `${Math.random() * 10 + 10}s`,
+    }))
+  );
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
+      {particles.map((particle, i) => (
         <div
           key={i}
           className="absolute rounded-full bg-gradient-to-r from-green-400/20 to-teal-400/20 blur-xl animate-float"
-          style={{
-            width: `${Math.random() * 100 + 50}px`,
-            height: `${Math.random() * 100 + 50}px`,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 5}s`,
-            animationDuration: `${Math.random() * 10 + 10}s`,
-          }}
+          style={particle}
         />
       ))}
     </div>
@@ -262,15 +266,6 @@ const securityHighlights = [
 const Home = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSent, setIsSent] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleContactSubmit = (e) => {
     e.preventDefault();
