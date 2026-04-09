@@ -48,7 +48,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <button onClick={() => handleScroll('home')} className="text-gray-600 hover:text-green-600 transition-colors font-medium text-sm lg:text-base">Home</button>
             <button onClick={() => handleScroll('about')} className="text-gray-600 hover:text-green-600 transition-colors font-medium text-sm lg:text-base">About Us</button>
-            <Link to="/project-info" className="text-gray-600 hover:text-green-600 transition-colors font-medium text-sm lg:text-base">Project Info</Link>
+
             <button onClick={() => handleScroll('services')} className="text-gray-600 hover:text-green-600 transition-colors font-medium text-sm lg:text-base">Services</button>
             <button onClick={() => handleScroll('contact')} className="text-gray-600 hover:text-green-600 transition-colors font-medium text-sm lg:text-base">Contact</button>
           </div>
@@ -128,13 +128,7 @@ const Navbar = () => {
           >
             About Us
           </button>
-          <Link
-            to="/project-info"
-            onClick={() => setIsMenuOpen(false)}
-            className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors"
-          >
-            Project Info
-          </Link>
+
           <button
             onClick={() => handleScroll('services')}
             className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors"
