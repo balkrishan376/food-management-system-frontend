@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import DonorDashboard from './pages/DonorDashboard';
 import ReceiverDashboard from './pages/ReceiverDashboard';
 import Profile from './pages/Profile';
+import ProjectInfo from './pages/ProjectInfo';
 import Footer from './components/common/Footer';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
@@ -31,6 +32,7 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/project-info" element={<ProjectInfo />} />
               <Route 
                 path="/donor-dashboard" 
                 element={

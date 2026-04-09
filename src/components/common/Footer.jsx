@@ -84,6 +84,12 @@ const Footer = () => {
                 </button>
               </li>
               <li>
+                <Link to="/project-info" className="text-gray-400 hover:text-green-400 transition-all text-sm flex items-center group">
+                  <span className="w-0 group-hover:w-2 h-0.5 bg-green-400 mr-0 transition-all duration-300"></span>
+                  Project Info
+                </Link>
+              </li>
+              <li>
                 <button onClick={() => scrollToSection('contact')} className="text-gray-400 hover:text-green-400 transition-all text-sm flex items-center group">
                   <span className="w-0 group-hover:w-2 h-0.5 bg-green-400 mr-0 transition-all duration-300"></span>
                   Contact Us
