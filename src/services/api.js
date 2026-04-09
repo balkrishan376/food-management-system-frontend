@@ -2,9 +2,11 @@ import axios from 'axios';
 
 const getBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  const { hostname } = window.location;
+  const { hostname, protocol, host } = window.location;
+  
   if (hostname !== 'localhost') {
-    return `http://${hostname}:5000/api`;
+    // On deployed environments, use relative path if possible or the same host
+    return '/api';
   }
   return 'http://localhost:5000/api';
 };
