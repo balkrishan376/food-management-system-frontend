@@ -714,70 +714,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Security & Trust Section */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
-        {/* Animated background effects */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-emerald-500/5 to-teal-500/5 rounded-full blur-3xl animate-pulse"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          {/* Section Header */}
-          <div className="max-w-3xl animate-slideInLeft">
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 border border-emerald-500/30 px-5 py-2 text-xs font-bold text-emerald-300 tracking-wide uppercase mb-4">
-              <ShieldCheck className="h-3 w-3" />
-              Security & Trust
-            </div>
-            <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
-              Designed to look{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">professional</span>{' '}
-              and feel{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-400">dependable</span>.
-            </h2>
-            <p className="mt-6 text-lg text-slate-300 leading-relaxed">
-              A donation platform must do more than look good. It must help users feel safe, informed, and confident while they act quickly.
-            </p>
-          </div>
 
-          {/* Security Cards */}
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {securityHighlights.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <div 
-                  key={item.title} 
-                  className="group relative rounded-[32px] border-2 border-white/10 bg-white/5 backdrop-blur-xl p-8 hover:bg-white/10 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 animate-fadeInUp"
-                  style={{ animationDelay: `${idx * 0.1}s` }}
-                >
-                  {/* Glow effect on hover */}
-                  <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-emerald-500/0 to-teal-500/0 group-hover:from-emerald-500/10 group-hover:to-teal-500/10 transition-all duration-300"></div>
-                  
-                  {/* Icon */}
-                  <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-500/30 text-emerald-300 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 mb-6">
-                    <Icon className="h-8 w-8" />
-                  </div>
-                  
-                  <h3 className="relative text-2xl font-bold text-white group-hover:text-emerald-300 transition-colors duration-300">{item.title}</h3>
-                  <p className="relative mt-4 text-slate-300 leading-relaxed">{item.text}</p>
-                  
-                  {/* Decorative element */}
-                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
-                </div>
-              );
-            })}
-          </div>
-          
-          {/* Trust Badge */}
-          <div className="mt-16 text-center animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
-            <div className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 px-8 py-4 backdrop-blur-sm">
-              <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-semibold text-emerald-300">Enterprise-Grade Security • 99.9% Uptime • GDPR Compliant</span>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section id="contact" className="py-24 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
