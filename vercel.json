@@ -1,34 +1,14 @@
 {
   "version": 2,
-  "builds": [
+  "framework": "vite",
+  "rewrites": [
     {
-      "src": "backend/server.js",
-      "use": "@vercel/node"
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
     },
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist",
-        "buildCommand": "npm run build"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/server.js",
-      "headers": { "Access-Control-Allow-Origin": "*" }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "frontend/dist/$1",
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "dest": "frontend/dist/index.html",
-      "status": 200
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
