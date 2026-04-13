@@ -8,12 +8,17 @@ const getBaseUrl = () => {
     return apiUrl || 'http://localhost:5000/api';
   }
   
-  // In production, use relative /api for monorepo deployments
-  // OR the VITE_API_URL if it's explicitly provided and NOT localhost
-  if (apiUrl && !apiUrl.includes('localhost')) {
-    return apiUrl;
+  // In production, if explicitly provided VITE_API_URL
+  if (apiUrl) {
+    // Ensure it ends with /api
+    const normalizedUrl = apiUrl.replace(/\/$/, ''); // Remove trailing slash
+    if (!normalizedUrl.endsWith('/api')) {
+      return `${normalizedUrl}/api`;
+    }
+    return normalizedUrl;
   }
   
+  // Fallback to relative /api for same-origin monorepo deployments
   return '/api';
 };
 
