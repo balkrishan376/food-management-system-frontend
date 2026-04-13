@@ -1,14 +1,20 @@
 import axios from 'axios';
 
 const getBaseUrl = () => {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  const { hostname, protocol, host } = window.location;
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const isLocalhost = window.location.hostname === 'localhost';
   
-  if (hostname !== 'localhost') {
-    // On deployed environments, use relative path if possible or the same host
-    return '/api';
+  if (isLocalhost) {
+    return apiUrl || 'http://localhost:5000/api';
   }
-  return 'http://localhost:5000/api';
+  
+  // In production, use relative /api for monorepo deployments
+  // OR the VITE_API_URL if it's explicitly provided and NOT localhost
+  if (apiUrl && !apiUrl.includes('localhost')) {
+    return apiUrl;
+  }
+  
+  return '/api';
 };
 
 const api = axios.create({

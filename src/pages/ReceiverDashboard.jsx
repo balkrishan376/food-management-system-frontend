@@ -3,7 +3,7 @@ import api from '../services/api';
 import { MapPin, RefreshCw } from 'lucide-react';
 
 const getUploadsBaseUrl = () => {
-  const apiBaseUrl = api.defaults.baseURL || 'http://localhost:5000/api';
+  const apiBaseUrl = api.defaults.baseURL || '/api';
   return apiBaseUrl.replace(/\/api$/, '');
 };
 
