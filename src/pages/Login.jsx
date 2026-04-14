@@ -30,7 +30,15 @@ const Login = () => {
       else if (user.role === 'receiver') navigate('/receiver-dashboard');
       else navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      if (err.message && err.message.includes('timed out')) {
+        setError('The server is starting up (cold start). Please wait 30 seconds and try again.');
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError('Login failed. Please check your credentials and try again.');
+      }
     } finally {
       setLoading(false);
     }

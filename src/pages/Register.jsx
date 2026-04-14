@@ -37,7 +37,15 @@ const Register = () => {
       else if (user.role === 'receiver') navigate('/receiver-dashboard');
       else navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      if (err.message && err.message.includes('timed out')) {
+        setError('The server is starting up (cold start). Please wait 30 seconds and try again.');
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError('Registration failed. Please check your connection and try again.');
+      }
     } finally {
       setLoading(false);
     }
