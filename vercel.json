@@ -3,12 +3,12 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://food-management-system-backend-x5xi.onrender.com/api/:path*"
+      "source": "/api/(.*)",
+      "destination": "https://food-management-system-backend-x5xi.onrender.com/api/$1"
     },
     {
-      "source": "/assets/:path*",
-      "destination": "/assets/:path*"
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
     },
     {
       "source": "/(.*)",
