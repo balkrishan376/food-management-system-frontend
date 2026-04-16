@@ -3,16 +3,15 @@ import axios from 'axios';
 const getBaseUrl = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  // Use relative path for production to leverage Vercel rewrites/proxy
-  // This avoids CORS issues and handles Render cold starts better via the proxy
-  if (import.meta.env.PROD && typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
-    return '/api';
-  }
-
-  // Use explicitly set environment variable if available (e.g., in development)
+  // Use explicitly set environment variable if available
   if (apiUrl) {
     const normalized = apiUrl.replace(/\/$/, '');
     return normalized.endsWith('/api') ? normalized : `${normalized}/api`;
+  }
+
+  // Production fallback to direct Render backend URL to avoid Vercel 10s proxy timeout
+  if (import.meta.env.PROD || (typeof window !== 'undefined' && !window.location.hostname.includes('localhost'))) {
+    return 'https://food-management-system-backend.onrender.com/api';
   }
 
   // Local development fallback
@@ -23,12 +22,12 @@ const getBaseUrl = () => {
     return 'http://localhost:5000/api';
   }
 
-  return '/api';
+  return 'https://food-management-system-backend.onrender.com/api';
 };
 
 const api = axios.create({
   baseURL: getBaseUrl(),
-  timeout: 45000, // Increased timeout for Render cold starts
+  timeout: 100000, // 100s to handle full Render cold start which can take up to 2 mins occasionally
 });
 
 api.interceptors.request.use((config) => {
