@@ -28,7 +28,8 @@ export default defineConfig({
     },
     minify: 'esbuild',
     esbuild: {
-      drop: ['console'],
+      // Allow console logs in production for easier debugging of API flows
+      drop: [], 
     },
   },
   preview: {
