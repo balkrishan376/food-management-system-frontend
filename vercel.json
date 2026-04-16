@@ -4,7 +4,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://food-management-system-backend-x5xi.onrender.com/api/$1"
+      "destination": "https://food-management-system-backend.onrender.com/api/$1"
     },
     {
       "source": "/assets/(.*)",
