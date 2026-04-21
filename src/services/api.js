@@ -27,17 +27,20 @@ const getBaseUrl = () => {
 
 const api = axios.create({
   baseURL: getBaseUrl(),
-  timeout: 300000, // 300s to handle extreme Render cold starts
+  // 60 seconds is enough to handle Render cold starts without causing the app to hang indefinitely
+  timeout: 60000, 
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
-// Configure axios-retry to handle Render cold starts silently
+// Configure axios-retry to handle Render cold starts where it might throw 502 Bad Gateway while waking up
 axiosRetry(api, {
-  retries: 30,
+  retries: 5, // Retry up to 5 times to cover a 45-second cold start window
   retryDelay: (retryCount) => {
-    return 5000; // 5 seconds between retries
+    return retryCount * 3000; // 3s, 6s, 9s, 12s, 15s delay between retries
   },
   retryCondition: (error) => {
-    // Retry on standard network errors or 500/502/503/504
     return (
       axiosRetry.isNetworkOrIdempotentRequestError(error) ||
       error.code === 'ECONNABORTED' ||
@@ -47,20 +50,23 @@ axiosRetry(api, {
   },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If it *still* failed after 30 retries, then inform the user
-    if ((error.code === 'ECONNABORTED' || error.message === 'Network Error') && error.config && error.config['axios-retry'] && error.config['axios-retry'].retryCount >= 30) {
-      return Promise.reject(new Error('The server is taking a while to start up (Cold Start). Please check your internet or try again later.'));
+    // Provide a scalable, user-friendly error message on network failure
+    if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
+      error.message = 'Network Error: The backend server is warming up or unreachable. Please wait 30 seconds and try again.';
     }
     return Promise.reject(error);
   }

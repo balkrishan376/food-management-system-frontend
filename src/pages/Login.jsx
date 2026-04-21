@@ -9,6 +9,7 @@ const Login = () => {
   const [role, setRole] = useState('donor');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLongLoading, setIsLongLoading] = useState(false);
   const { login, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -16,8 +17,14 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setIsLongLoading(false);
+    
+    // Warn user if request takes more than 4 seconds that the free server might be waking up
+    const longLoadTimer = setTimeout(() => setIsLongLoading(true), 4000);
+
     try {
       const user = await login(email, password);
+      clearTimeout(longLoadTimer);
       // Validate role
       if (user.role !== role) {
         logout();
@@ -30,17 +37,17 @@ const Login = () => {
       else if (user.role === 'receiver') navigate('/receiver-dashboard');
       else navigate('/');
     } catch (err) {
-      if (err.message && err.message.includes('timed out')) {
-        setError('The server is starting up (cold start). Please wait 30 seconds and try again.');
-      } else if (err.response?.data?.message) {
+      if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else if (err.message) {
         setError(err.message);
       } else {
-        setError('Login failed. Please check your credentials and try again.');
+        setError('Login failed. Please check your network connection and try again.');
       }
     } finally {
+      clearTimeout(longLoadTimer);
       setLoading(false);
+      setIsLongLoading(false);
     }
   };
 
@@ -154,7 +161,7 @@ const Login = () => {
               type="submit" disabled={loading}
               className="w-full flex items-center justify-center py-3.5 px-4 border border-transparent shadow shadow-green-500/30 rounded-xl text-white bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-base font-bold transition-all transform hover:-translate-y-0.5 mt-8 disabled:opacity-70 disabled:hover:transform-none"
             >
-              {loading ? 'Authenticating...' : (
+              {loading ? (isLongLoading ? 'Waking up secure server (~45s)...' : 'Authenticating...') : (
                 <>
                   <LogIn className="w-5 h-5 mr-2" />
                   Sign In

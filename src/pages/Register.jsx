@@ -14,6 +14,7 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLongLoading, setIsLongLoading] = useState(false);
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -30,24 +31,30 @@ const Register = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setIsLongLoading(false);
+
+    // Warn user if request takes more than 4 seconds that the free server might be waking up
+    const longLoadTimer = setTimeout(() => setIsLongLoading(true), 4000);
+
     try {
       // Pass coordinates as 0 for initial registration mock, in real life use browser geolocator
       const user = await register({ ...formData, latitude: 0, longitude: 0 });
+      clearTimeout(longLoadTimer);
       if (user.role === 'donor') navigate('/donor-dashboard');
       else if (user.role === 'receiver') navigate('/receiver-dashboard');
       else navigate('/');
     } catch (err) {
-      if (err.message && err.message.includes('timed out')) {
-        setError('The server is starting up (cold start). Please wait 30 seconds and try again.');
-      } else if (err.response?.data?.message) {
+      if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else if (err.message) {
         setError(err.message);
       } else {
-        setError('Registration failed. Please check your connection and try again.');
+        setError('Registration failed. Please check your network connection and try again.');
       }
     } finally {
+      clearTimeout(longLoadTimer);
       setLoading(false);
+      setIsLongLoading(false);
     }
   };
 
@@ -206,7 +213,7 @@ const Register = () => {
               type="submit" disabled={loading}
               className="w-full flex items-center justify-center py-3.5 px-4 border border-transparent shadow shadow-gray-900/20 rounded-xl text-white bg-gray-900 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-base font-bold transition-all transform hover:-translate-y-0.5 mt-8 disabled:opacity-70 disabled:hover:transform-none"
             >
-              {loading ? 'Processing...' : 'Create Account'}
+              {loading ? (isLongLoading ? 'Waking up secure server (~45s)...' : 'Processing...') : 'Create Account'}
             </button>
           </form>
 
