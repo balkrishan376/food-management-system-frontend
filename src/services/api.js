@@ -27,14 +27,14 @@ const getBaseUrl = () => {
 
 const api = axios.create({
   baseURL: getBaseUrl(),
-  timeout: 100000, // 100s to handle full Render cold start which can take up to 2 mins occasionally
+  timeout: 300000, // 300s to handle extreme Render cold starts
 });
 
 // Configure axios-retry to handle Render cold starts silently
 axiosRetry(api, {
-  retries: 15,
+  retries: 30,
   retryDelay: (retryCount) => {
-    return 3000; // 3 seconds between retries
+    return 5000; // 5 seconds between retries
   },
   retryCondition: (error) => {
     // Retry on standard network errors or 500/502/503/504
@@ -58,8 +58,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If it *still* failed after 15 retries (approx 45s), then inform the user
-    if ((error.code === 'ECONNABORTED' || error.message === 'Network Error') && error.config && error.config['axios-retry'] && error.config['axios-retry'].retryCount >= 15) {
+    // If it *still* failed after 30 retries, then inform the user
+    if ((error.code === 'ECONNABORTED' || error.message === 'Network Error') && error.config && error.config['axios-retry'] && error.config['axios-retry'].retryCount >= 30) {
       return Promise.reject(new Error('The server is taking a while to start up (Cold Start). Please check your internet or try again later.'));
     }
     return Promise.reject(error);
