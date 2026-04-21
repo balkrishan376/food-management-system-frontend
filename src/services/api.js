@@ -1,4 +1,5 @@
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 
 const getBaseUrl = () => {
   // Production fallback to direct Render backend URL to avoid Vercel 10s proxy timeout
@@ -29,6 +30,23 @@ const api = axios.create({
   timeout: 100000, // 100s to handle full Render cold start which can take up to 2 mins occasionally
 });
 
+// Configure axios-retry to handle Render cold starts silently
+axiosRetry(api, {
+  retries: 15,
+  retryDelay: (retryCount) => {
+    return 3000; // 3 seconds between retries
+  },
+  retryCondition: (error) => {
+    // Retry on standard network errors or 500/502/503/504
+    return (
+      axiosRetry.isNetworkOrIdempotentRequestError(error) ||
+      error.code === 'ECONNABORTED' ||
+      error.message === 'Network Error' ||
+      (error.response && error.response.status >= 500 && error.response.status <= 599)
+    );
+  },
+});
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -40,10 +58,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // When Render is waking up, it often returns a 502 Bad Gateway which lacks CORS headers, 
-    // causing Axios to throw a "Network Error".
-    if (error.code === 'ECONNABORTED' || error.message === 'Network Error') {
-      return Promise.reject(new Error('The server is taking a while to start up (Cold Start). Please wait 30 seconds and try again.'));
+    // If it *still* failed after 15 retries (approx 45s), then inform the user
+    if ((error.code === 'ECONNABORTED' || error.message === 'Network Error') && error.config && error.config['axios-retry'] && error.config['axios-retry'].retryCount >= 15) {
+      return Promise.reject(new Error('The server is taking a while to start up (Cold Start). Please check your internet or try again later.'));
     }
     return Promise.reject(error);
   }

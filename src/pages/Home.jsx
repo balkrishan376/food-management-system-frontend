@@ -267,6 +267,14 @@ const Home = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSent, setIsSent] = useState(false);
 
+  // Warm up the backend (Render free tier cold start mitigation)
+  useEffect(() => {
+    // We intentionally don't care about the response, just hitting the endpoint
+    // to wake up the server so it's ready when the user goes to login/register.
+    fetch('https://food-management-system-backend.onrender.com/api/health')
+      .catch(() => { /* silently ignore network errors */ });
+  }, []);
+
   const handleContactSubmit = (e) => {
     e.preventDefault();
     setIsSent(true);
