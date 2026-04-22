@@ -7,6 +7,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Warm up the backend immediately on mount (silent request)
+    api.get('/health').catch(() => {});
+
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -24,6 +27,7 @@ export const AuthProvider = ({ children }) => {
 
     fetchUser();
   }, []);
+
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });

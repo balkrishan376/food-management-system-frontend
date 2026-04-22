@@ -27,28 +27,42 @@ const getBaseUrl = () => {
 
 const api = axios.create({
   baseURL: getBaseUrl(),
-  // 60 seconds is enough to handle Render cold starts without causing the app to hang indefinitely
-  timeout: 60000, 
+  // 90 seconds timeout to handle the longest possible Render cold starts + some buffer
+  timeout: 90000, 
   headers: {
     'Content-Type': 'application/json',
   }
 });
 
-// Configure axios-retry to handle Render cold starts where it might throw 502 Bad Gateway while waking up
+// Configure axios-retry to handle Render cold starts robustly
 axiosRetry(api, {
-  retries: 5, // Retry up to 5 times to cover a 45-second cold start window
+  retries: 7, // More retries to cover up to ~60-70 seconds of cold start
   retryDelay: (retryCount) => {
-    return retryCount * 3000; // 3s, 6s, 9s, 12s, 15s delay between retries
+    // Progressive delay: 2s, 4s, 6s, 8s, 10s, 12s, 14s
+    return retryCount * 2000;
   },
   retryCondition: (error) => {
-    return (
-      axiosRetry.isNetworkOrIdempotentRequestError(error) ||
-      error.code === 'ECONNABORTED' ||
-      error.message === 'Network Error' ||
-      (error.response && error.response.status >= 500 && error.response.status <= 599)
-    );
+    // Retry on network errors regardless of method (POST is safe for cold-start wake-up)
+    if (axiosRetry.isNetworkError(error) || error.code === 'ECONNABORTED' || error.message === 'Network Error') {
+      return true;
+    }
+    
+    // Specifically retry on 502, 503, 504 which are common during Render cold starts
+    // We allow retrying POST here because if we get a 502/503/504 from Render, 
+    // it usually means the request never even reached our application logic.
+    if (error.response && [502, 503, 504].includes(error.response.status)) {
+      return true;
+    }
+
+    // Default idempotent check for other 5xx errors
+    return axiosRetry.isIdempotentRequestError(error);
   },
+  onRetry: (retryCount, error, requestConfig) => {
+    console.log(`♻️ Retrying request (${retryCount}/7)... Backend is likely warming up.`);
+  },
+  shouldResetTimeout: true,
 });
+
 
 api.interceptors.request.use(
   (config) => {
@@ -64,12 +78,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Provide a scalable, user-friendly error message on network failure
-    if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
-      error.message = 'Network Error: The backend server is warming up or unreachable. Please wait 30 seconds and try again.';
+    // Provide a clear message for persistent network issues
+    if (error.message === 'Network Error' || error.code === 'ECONNABORTED' || (error.response && error.response.status >= 502)) {
+      error.message = 'The server is taking a moment to wake up. Please wait about 30 seconds and try again. This only happens on the first visit.';
     }
     return Promise.reject(error);
   }
 );
 
 export default api;
+
