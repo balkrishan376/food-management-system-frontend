@@ -2,12 +2,15 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
 const getBaseUrl = () => {
-  // Production fallback to direct Render backend URL to avoid Vercel 10s proxy timeout
+  // Production: Prioritize Railway if available, then fallback to Render
   if (import.meta.env.PROD || (typeof window !== 'undefined' && !window.location.hostname.includes('localhost'))) {
-    return 'https://food-management-system-backend.onrender.com/api';
+    // Check if a Railway URL is provided in env, otherwise use the hardcoded one
+    // Replace the URL below with your Railway URL once deployed
+    return import.meta.env.VITE_RAILWAY_URL || 'https://food-management-system-backend.onrender.com/api';
   }
 
   const apiUrl = import.meta.env.VITE_API_URL;
+
   // Use explicitly set environment variable if available
   if (apiUrl) {
     const normalized = apiUrl.replace(/\/$/, '');
