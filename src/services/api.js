@@ -36,9 +36,10 @@ const api = axios.create({
 
 // Configure axios-retry to handle Render cold starts robustly
 axiosRetry(api, {
-  retries: 7, // More retries to cover up to ~60-70 seconds of cold start
+  retries: 10, // Increased to 10 retries to cover extreme cold start delays (up to 2-3 mins)
   retryDelay: (retryCount) => {
-    // Progressive delay: 2s, 4s, 6s, 8s, 10s, 12s, 14s
+    // Progressive delay: 2s, 4s, 6s, 8s, 10s, 12s, 14s, 16s, 18s, 20s
+    // Total wait time will be ~110 seconds + request durations
     return retryCount * 2000;
   },
   retryCondition: (error) => {
@@ -48,20 +49,20 @@ axiosRetry(api, {
     }
     
     // Specifically retry on 502, 503, 504 which are common during Render cold starts
-    // We allow retrying POST here because if we get a 502/503/504 from Render, 
-    // it usually means the request never even reached our application logic.
     if (error.response && [502, 503, 504].includes(error.response.status)) {
       return true;
     }
+
 
     // Default idempotent check for other 5xx errors
     return axiosRetry.isIdempotentRequestError(error);
   },
   onRetry: (retryCount, error, requestConfig) => {
-    console.log(`♻️ Retrying request (${retryCount}/7)... Backend is likely warming up.`);
+    console.log(`♻️ Retrying request (${retryCount}/10)... Backend is likely warming up.`);
   },
   shouldResetTimeout: true,
 });
+
 
 
 api.interceptors.request.use(
